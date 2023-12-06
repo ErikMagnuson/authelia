@@ -18,6 +18,8 @@ import {
     RevokeResetPasswordRoute,
     SettingsRoute,
 } from "@constants/Routes";
+import LocalStorageSecondFactorMethodContextProvider from "@contexts/LocalStorageSecondFactorMethodContext";
+import LocalStorageMethodContextProvider from "@contexts/LocalStorageMethodContext";
 import NotificationsContext from "@hooks/NotificationsContext";
 import { Notification } from "@models/Notifications";
 import { getLocalStorageWithFallback } from "@services/LocalStorage";
@@ -108,29 +110,31 @@ const App: React.FC<Props> = (props: Props) => {
                 <Suspense fallback={<LoadingPage />}>
                     <CssBaseline />
                     <NotificationsContext.Provider value={{ notification, setNotification }}>
-                        <Router basename={getBasePath()}>
-                            <NotificationBar onClose={() => setNotification(null)} />
-                            <Routes>
-                                <Route path={ResetPasswordStep1Route} element={<ResetPasswordStep1 />} />
-                                <Route path={ResetPasswordStep2Route} element={<ResetPasswordStep2 />} />
-                                <Route path={LogoutRoute} element={<SignOut />} />
-                                <Route path={ConsentRoute} element={<ConsentView />} />
-                                <Route path={RevokeOneTimeCodeRoute} element={<RevokeOneTimeCodeView />} />
-                                <Route path={RevokeResetPasswordRoute} element={<RevokeResetPasswordTokenView />} />
-                                <Route path={`${SettingsRoute}/*`} element={<SettingsRouter />} />
-                                <Route
-                                    path={`${IndexRoute}*`}
-                                    element={
-                                        <LoginPortal
-                                            duoSelfEnrollment={getDuoSelfEnrollment()}
-                                            rememberMe={getRememberMe()}
-                                            resetPassword={getResetPassword()}
-                                            resetPasswordCustomURL={getResetPasswordCustomURL()}
-                                        />
-                                    }
-                                />
-                            </Routes>
-                        </Router>
+                        <LocalStorageMethodContextProvider>
+                            <Router basename={getBasePath()}>
+                                <NotificationBar onClose={() => setNotification(null)} />
+                                <Routes>
+                                    <Route path={ResetPasswordStep1Route} element={<ResetPasswordStep1 />} />
+                                    <Route path={ResetPasswordStep2Route} element={<ResetPasswordStep2 />} />
+                                    <Route path={LogoutRoute} element={<SignOut />} />
+                                    <Route path={ConsentRoute} element={<ConsentView />} />
+                                    <Route path={RevokeOneTimeCodeRoute} element={<RevokeOneTimeCodeView />} />
+                                    <Route path={RevokeResetPasswordRoute} element={<RevokeResetPasswordTokenView />} />
+                                    <Route path={`${SettingsRoute}/*`} element={<SettingsRouter />} />
+                                    <Route
+                                        path={`${IndexRoute}*`}
+                                        element={
+                                            <LoginPortal
+                                                duoSelfEnrollment={getDuoSelfEnrollment()}
+                                                rememberMe={getRememberMe()}
+                                                resetPassword={getResetPassword()}
+                                                resetPasswordCustomURL={getResetPasswordCustomURL()}
+                                            />
+                                        }
+                                    />
+                                </Routes>
+                            </Router>
+                        </LocalStorageMethodContextProvider>
                     </NotificationsContext.Provider>
                 </Suspense>
             </ThemeProvider>
