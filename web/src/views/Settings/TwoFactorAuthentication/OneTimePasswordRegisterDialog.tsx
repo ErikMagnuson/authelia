@@ -243,6 +243,39 @@ const OneTimePasswordRegisterDialog = function (props: Props) {
         })();
     }, [activeStep, dialState, dialValue, dialValue.length, handleFinished, props.open, selected.length]);
 
+    const handleChangeAlgorithm = (ev: React.ChangeEvent<HTMLInputElement>, value: string) => {
+        setSelected((prevState) => {
+            return {
+                ...prevState,
+                algorithm: value,
+            };
+        });
+
+        ev.preventDefault();
+    };
+
+    const handleChangeLength = (ev: React.ChangeEvent<HTMLInputElement>, value: string) => {
+        setSelected((prevState) => {
+            return {
+                ...prevState,
+                length: parseInt(value),
+            };
+        });
+
+        ev.preventDefault();
+    };
+
+    const handleChangePeriod = (ev: React.ChangeEvent<HTMLInputElement>, value: string) => {
+        setSelected((prevState) => {
+            return {
+                ...prevState,
+                period: parseInt(value),
+            };
+        });
+
+        ev.preventDefault();
+    };
+
     const toggleAdvanced = () => {
         setShowAdvanced((prevState) => !prevState);
     };
@@ -277,7 +310,13 @@ const OneTimePasswordRegisterDialog = function (props: Props) {
                                 <Grid xs={12} hidden={disableAdvanced}>
                                     <FormControlLabel
                                         disabled={disableAdvanced}
-                                        control={<Switch checked={showAdvanced} onChange={toggleAdvanced} />}
+                                        control={
+                                            <Switch
+                                                id={"one-time-password-advanced"}
+                                                checked={showAdvanced}
+                                                onChange={toggleAdvanced}
+                                            />
+                                        }
                                         label={translate("Advanced")}
                                     />
                                 </Grid>
@@ -299,22 +338,13 @@ const OneTimePasswordRegisterDialog = function (props: Props) {
                                             style={{
                                                 justifyContent: "center",
                                             }}
-                                            onChange={(e, value) => {
-                                                setSelected((prevState) => {
-                                                    return {
-                                                        ...prevState,
-                                                        algorithm: value,
-                                                    };
-                                                });
-
-                                                e.preventDefault();
-                                            }}
+                                            onChange={handleChangeAlgorithm}
                                         >
                                             {available.algorithms.map((algorithm) => (
                                                 <FormControlLabel
                                                     key={algorithm}
                                                     value={algorithm}
-                                                    control={<Radio />}
+                                                    control={<Radio id={`one-time-password-algorithm-${algorithm}`} />}
                                                     label={algorithm}
                                                 />
                                             ))}
@@ -330,22 +360,15 @@ const OneTimePasswordRegisterDialog = function (props: Props) {
                                             style={{
                                                 justifyContent: "center",
                                             }}
-                                            onChange={(e, value) => {
-                                                setSelected((prevState) => {
-                                                    return {
-                                                        ...prevState,
-                                                        length: parseInt(value),
-                                                    };
-                                                });
-
-                                                e.preventDefault();
-                                            }}
+                                            onChange={handleChangeLength}
                                         >
                                             {available.lengths.map((length) => (
                                                 <FormControlLabel
                                                     key={length.toString()}
                                                     value={length.toString()}
-                                                    control={<Radio />}
+                                                    control={
+                                                        <Radio id={`one-time-password-length-${length.toString()}`} />
+                                                    }
                                                     label={length.toString()}
                                                 />
                                             ))}
@@ -361,22 +384,15 @@ const OneTimePasswordRegisterDialog = function (props: Props) {
                                             style={{
                                                 justifyContent: "center",
                                             }}
-                                            onChange={(e, value) => {
-                                                setSelected((prevState) => {
-                                                    return {
-                                                        ...prevState,
-                                                        period: parseInt(value),
-                                                    };
-                                                });
-
-                                                e.preventDefault();
-                                            }}
+                                            onChange={handleChangePeriod}
                                         >
                                             {available.periods.map((period) => (
                                                 <FormControlLabel
                                                     key={period.toString()}
                                                     value={period.toString()}
-                                                    control={<Radio />}
+                                                    control={
+                                                        <Radio id={`one-time-password-period-${period.toString()}`} />
+                                                    }
                                                     label={period.toString()}
                                                 />
                                             ))}
