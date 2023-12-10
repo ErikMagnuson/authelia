@@ -153,11 +153,11 @@ func (rs *RodSession) doWebAuthnCredentialRegister(t *testing.T, page *rod.Page,
 	rs.doHoverAllMuiTooltip(t, page)
 	require.NoError(t, page.WaitStable(time.Millisecond*100))
 
-	rs.doSettingsMenuClose(t, page)
+	rs.doOpenSettingsMenuClickClose(t, page)
 }
 
 func (rs *RodSession) doWebAuthnCredentialRegisterAfterVisitSettings(t *testing.T, page *rod.Page, description string) {
-	rs.doSettingsOpen(t, page)
-	rs.doSettingsMenuTwoFactor(t, page)
+	rs.doOpenSettings(t, page)
+	rs.doOpenSettingsMenuClickTwoFactor(t, page)
 	rs.doWebAuthnCredentialRegister(t, page, description)
 }

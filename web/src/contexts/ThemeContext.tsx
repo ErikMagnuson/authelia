@@ -3,9 +3,11 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { Theme, ThemeProvider } from "@mui/material";
 
 import { LocalStorageThemeName } from "@constants/LocalStorage";
-import { getLocalStorageWithFallback, localStorageAvailable } from "@services/LocalStorage";
+import { localStorageAvailable } from "@services/LocalStorage";
 import * as themes from "@themes/index";
 import { getTheme } from "@utils/Configuration";
+
+const MediaQueryDarkMode = "(prefers-color-scheme: dark)";
 
 export const ThemeContext = createContext<ValueProps | null>(null);
 
@@ -26,8 +28,7 @@ export default function ThemeContextProvider(props: Props) {
 
     useEffect(() => {
         if (themeName === themes.ThemeNameAuto) {
-            const query = window.matchMedia("(prefers-color-scheme: dark)");
-            // MediaQueryLists does not inherit from EventTarget in Internet Explorer
+            const query = window.matchMedia(MediaQueryDarkMode);
             if (query.addEventListener) {
                 query.addEventListener("change", mediaQueryListener);
 
@@ -128,12 +129,20 @@ function ThemeFromName(name: string) {
         case themes.ThemeNameGrey:
             return themes.Grey;
         case themes.ThemeNameAuto:
-            return window.matchMedia("(prefers-color-scheme: dark)").matches ? themes.Dark : themes.Light;
+            return window.matchMedia(MediaQueryDarkMode).matches ? themes.Dark : themes.Light;
         default:
-            return window.matchMedia("(prefers-color-scheme: dark)").matches ? themes.Dark : themes.Light;
+            return window.matchMedia(MediaQueryDarkMode).matches ? themes.Dark : themes.Light;
     }
 }
 
 const getUserThemeName = () => {
-    return getLocalStorageWithFallback(LocalStorageThemeName, getTheme());
+    if (localStorageAvailable()) {
+        const value = window.localStorage.getItem(LocalStorageThemeName);
+
+        if (value) {
+            return value;
+        }
+    }
+
+    return getTheme();
 };

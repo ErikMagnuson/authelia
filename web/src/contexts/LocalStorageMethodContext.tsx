@@ -32,7 +32,7 @@ export default function LocalStorageMethodContextProvider(props: Props) {
     }, []);
 
     const listener = (ev: globalThis.StorageEvent): any => {
-        if (ev.storageArea !== window.localStorage || ev.key !== LocalStorageSecondFactorMethod) {
+        if (ev.key !== LocalStorageSecondFactorMethod) {
             return;
         }
 

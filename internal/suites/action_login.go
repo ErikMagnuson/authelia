@@ -64,7 +64,7 @@ func (rs *RodSession) doLoginSecondFactorTOTP(t *testing.T, page *rod.Page, user
 // Login 1FA and register 2FA.
 func (rs *RodSession) doLoginAndRegisterTOTP(t *testing.T, page *rod.Page, username, password string, keepMeLoggedIn bool) {
 	rs.doLoginOneFactor(t, page, username, password, keepMeLoggedIn, BaseDomain, "")
-	rs.doRegisterTOTP(t, page, username)
+	rs.doOpenSettingsAndRegisterTOTP(t, page, username)
 
 	rs.verifyIsSecondFactorPage(t, page)
 }

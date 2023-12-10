@@ -104,8 +104,8 @@ func (s *TwoFactorWebAuthnSuite) TestShouldRenameCredential() {
 	password := testPassword
 
 	s.doLoginOneFactor(s.T(), s.Context(ctx), username, password, false, BaseDomain, "")
-	s.doSettingsOpen(s.T(), s.Context(ctx))
-	s.doSettingsMenuTwoFactor(s.T(), s.Context(ctx))
+	s.doOpenSettings(s.T(), s.Context(ctx))
+	s.doOpenSettingsMenuClickTwoFactor(s.T(), s.Context(ctx))
 
 	s.Assert().Equal("testing", s.WaitElementLocatedByID(s.T(), s.Context(ctx), "webauthn-credential-0-description").MustText())
 
@@ -129,8 +129,8 @@ func (s *TwoFactorWebAuthnSuite) TestShouldShowCredentialInformation() {
 	password := testPassword
 
 	s.doLoginOneFactor(s.T(), s.Context(ctx), username, password, false, BaseDomain, "")
-	s.doSettingsOpen(s.T(), s.Context(ctx))
-	s.doSettingsMenuTwoFactor(s.T(), s.Context(ctx))
+	s.doOpenSettings(s.T(), s.Context(ctx))
+	s.doOpenSettingsMenuClickTwoFactor(s.T(), s.Context(ctx))
 
 	s.Require().NoError(s.WaitElementLocatedByID(s.T(), s.Context(ctx), "webauthn-credential-0-information").Click("left", 1))
 	s.Require().NoError(s.WaitElementLocatedByID(s.T(), s.Context(ctx), "dialog-close").Click("left", 1))
@@ -147,8 +147,8 @@ func (s *TwoFactorWebAuthnSuite) TestShouldDeleteAndRegisterCredential() {
 	password := testPassword
 
 	s.doLoginOneFactor(s.T(), s.Context(ctx), username, password, false, BaseDomain, "")
-	s.doSettingsOpen(s.T(), s.Context(ctx))
-	s.doSettingsMenuTwoFactor(s.T(), s.Context(ctx))
+	s.doOpenSettings(s.T(), s.Context(ctx))
+	s.doOpenSettingsMenuClickTwoFactor(s.T(), s.Context(ctx))
 
 	s.doWebAuthnCredentialMustDelete(s.T(), s.Context(ctx))
 	s.doWebAuthnCredentialRegister(s.T(), s.Context(ctx), "testing")

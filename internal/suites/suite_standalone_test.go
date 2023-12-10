@@ -161,7 +161,7 @@ func (s *StandaloneWebDriverSuite) TestShouldCheckUserIsAskedToRegisterDevice() 
 	s.WaitElementLocatedByClassName(s.T(), s.Context(ctx), "state-not-registered")
 
 	// Then register the TOTP factor.
-	s.doRegisterTOTP(s.T(), s.Context(ctx), username)
+	s.doOpenSettingsAndRegisterTOTP(s.T(), s.Context(ctx), username)
 	// And logout.
 	s.doLogout(s.T(), s.Context(ctx))
 

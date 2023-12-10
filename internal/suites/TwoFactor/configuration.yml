@@ -39,6 +39,18 @@ storage:
 totp:
   issuer: example.com
   disable_reuse_security_policy: true
+  allowed_algorithms:
+    - SHA1
+    - SHA256
+    - SHA512
+  allowed_digits:
+    - 6
+    - 8
+  allowed_periods:
+    - 30
+    - 60
+    - 90
+    - 120
 
 access_control:
   default_policy: deny
@@ -71,6 +83,7 @@ notifier:
     address: 'smtp://smtp:1025'
     sender: admin@example.com
     disable_require_tls: true
+
 ntp:
   ## NTP server address
   address: "time.cloudflare.com:123"
