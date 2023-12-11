@@ -21,7 +21,11 @@ type OptionsTOTP struct {
 }
 
 func (rs *RodSession) doMaybeDeleteTOTP(t *testing.T, page *rod.Page, username string) {
-	//require.NoError(t, page.WaitStable(time.Millisecond*100))
+	ctx := page.GetContext()
+
+	require.NoError(t, ctx.Err())
+
+	require.NoError(t, page.WaitStable(time.Millisecond*50))
 
 	has, _, err := page.Has("#one-time-password-delete")
 	require.NoError(t, err)
@@ -68,10 +72,6 @@ func (rs *RodSession) doRegisterTOTPFinish(t *testing.T, page *rod.Page, usernam
 	rs.verifyNotificationDisplayed(t, page, "Successfully added the One-Time Password.")
 
 	rs.SetOneTimePassword(username, credential)
-
-	//require.NoError(t, page.WaitStable(time.Millisecond*100))
-	rs.doHoverAllMuiTooltip(t, page)
-	//require.NoError(t, page.WaitStable(time.Millisecond*100))
 }
 
 func (rs *RodSession) doRegisterTOTPAdvanced(t *testing.T, page *rod.Page, username string, algorithm string, digits, period int) {
@@ -186,6 +186,10 @@ func (rs *RodSession) doOpenSettingsAndRegisterTOTP(t *testing.T, page *rod.Page
 	require.NoError(t, rs.WaitElementLocatedByID(t, page, "dialog-next").Click("left", 1))
 
 	rs.doRegisterTOTPFinish(t, page, username, credential)
+
+	require.NoError(t, page.WaitStable(time.Millisecond*50))
+	rs.doHoverAllMuiTooltip(t, page)
+	require.NoError(t, page.WaitStable(time.Millisecond*50))
 
 	rs.doOpenSettingsMenuClickClose(t, page)
 }

@@ -15,7 +15,7 @@ func (rs *RodSession) doOpenSettings(t *testing.T, page *rod.Page) {
 }
 
 func (rs *RodSession) doOpenSettingsMenu(t *testing.T, page *rod.Page) {
-	require.NoError(t, page.WaitStable(time.Millisecond*500))
+	require.NoError(t, page.WaitStable(time.Millisecond*100))
 
 	rs.doHoverAllMuiTooltip(t, page)
 

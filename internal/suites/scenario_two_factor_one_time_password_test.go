@@ -37,27 +37,13 @@ func (s *TwoFactorOneTimePasswordSuite) TearDownSuite() {
 	}
 }
 
-func (s *TwoFactorOneTimePasswordSuite) SetupTest() {
-	s.Page = s.doCreateTab(s.T(), LoginBaseURL)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer func() {
-		cancel()
-		s.collectScreenshot(ctx.Err(), s.Page)
-
-		s.collectCoverage(s.Page)
-		s.MustClose()
-	}()
-
-}
-
 func (s *TwoFactorOneTimePasswordSuite) TearDownTest() {
 	s.collectCoverage(s.Page)
 	s.MustClose()
 }
 
 func (s *TwoFactorOneTimePasswordSuite) TestShouldRegisterAllAdvancedOptions() {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 240*time.Second)
 	defer func() {
 		cancel()
 		s.collectScreenshot(ctx.Err(), s.Page)

@@ -149,9 +149,9 @@ func (rs *RodSession) doWebAuthnCredentialRegister(t *testing.T, page *rod.Page,
 
 	rs.doWebAuthnUpdateCredentials(t, page)
 
-	require.NoError(t, page.WaitStable(time.Millisecond*100))
+	require.NoError(t, page.WaitStable(time.Millisecond*50))
 	rs.doHoverAllMuiTooltip(t, page)
-	require.NoError(t, page.WaitStable(time.Millisecond*100))
+	require.NoError(t, page.WaitStable(time.Millisecond*50))
 
 	rs.doOpenSettingsMenuClickClose(t, page)
 }

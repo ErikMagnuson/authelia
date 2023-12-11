@@ -98,10 +98,12 @@ const OneTimePasswordRegisterDialog = function (props: Props) {
         setSecretValue(null);
         setIsLoading(false);
         setShowAdvanced(false);
+        setHasErrored(false);
         setActiveStep(0);
         setDialValue("");
         setDialState(State.Idle);
         setShowQRCode(true);
+        setSuccess(false);
     }, [defaults]);
 
     const handleClose = useCallback(() => {
