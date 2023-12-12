@@ -113,11 +113,11 @@ func (rs *RodSession) doRegisterTOTPAdvanced(t *testing.T, page *rod.Page, usern
 	var alg otp.Algorithm
 
 	switch strings.ToUpper(ualgorithm) {
-	case "SHA1":
+	case SHA1:
 		alg = otp.AlgorithmSHA1
-	case "SHA256":
+	case SHA256:
 		alg = otp.AlgorithmSHA256
-	case "SHA512":
+	case SHA512:
 		alg = otp.AlgorithmSHA512
 	}
 
@@ -162,11 +162,11 @@ func (rs *RodSession) doOpenSettingsAndRegisterTOTP(t *testing.T, page *rod.Page
 	algorithm := otp.AlgorithmSHA1
 
 	switch strings.ToUpper(values.Get("algorithm")) {
-	case "SHA1":
+	case SHA1:
 		algorithm = otp.AlgorithmSHA1
-	case "SHA256":
+	case SHA256:
 		algorithm = otp.AlgorithmSHA256
-	case "SHA512":
+	case SHA512:
 		algorithm = otp.AlgorithmSHA512
 	}
 

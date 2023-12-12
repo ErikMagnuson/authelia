@@ -54,7 +54,7 @@ func (s *TwoFactorOneTimePasswordSuite) TestShouldRegisterAllAdvancedOptions() {
 	s.doOpenSettings(s.T(), s.Context(ctx))
 	s.doOpenSettingsMenuClickTwoFactor(s.T(), s.Context(ctx))
 
-	algorithms := []string{"SHA1", "SHA256", "SHA512"}
+	algorithms := []string{SHA1, SHA256, SHA512}
 	lengths := []int{6, 8}
 	periods := []int{30, 60, 90, 120}
 
