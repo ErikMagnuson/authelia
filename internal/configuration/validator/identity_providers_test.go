@@ -188,6 +188,30 @@ func TestShouldRaiseErrorWhenOIDCServerClientBadValues(t *testing.T) {
 			},
 		},
 		{
+			name: "BadIDTooLong",
+			clients: []schema.IdentityProvidersOpenIDConnectClient{
+				{
+					ID:     "abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123",
+					Secret: tOpenIDConnectPlainTextClientSecret,
+				},
+			},
+			errors: []string{
+				"identity_providers: oidc: clients: client 'abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123': option 'id' must not be more than 100 characters but it has 108 characters",
+			},
+		},
+		{
+			name: "BadIDInvalidCharacters",
+			clients: []schema.IdentityProvidersOpenIDConnectClient{
+				{
+					ID:     "@!#!@$!@#*()!&@%*(!^@#*()!&@^%!(_@#&",
+					Secret: tOpenIDConnectPlainTextClientSecret,
+				},
+			},
+			errors: []string{
+				"identity_providers: oidc: clients: client '@!#!@$!@#*()!&@%*(!^@#*()!&@^%!(_@#&': option 'id' must only contain RFC3986 unreserved characters",
+			},
+		},
+		{
 			name: "InvalidPolicy",
 			clients: []schema.IdentityProvidersOpenIDConnectClient{
 				{
@@ -201,6 +225,25 @@ func TestShouldRaiseErrorWhenOIDCServerClientBadValues(t *testing.T) {
 			},
 			errors: []string{
 				"identity_providers: oidc: clients: client 'client-1': option 'authorization_policy' must be one of 'one_factor' or 'two_factor' but it's configured as 'a-policy'",
+			},
+		},
+		{
+			name: "InvalidPolicyCCG",
+			clients: []schema.IdentityProvidersOpenIDConnectClient{
+				{
+					ID:                  "client-1",
+					Secret:              tOpenIDConnectPlainTextClientSecret,
+					AuthorizationPolicy: "a-policy",
+					RedirectURIs: []string{
+						"https://google.com",
+					},
+					GrantTypes: []string{
+						oidc.GrantTypeClientCredentials,
+					},
+				},
+			},
+			errors: []string{
+				"identity_providers: oidc: clients: client 'client-1': option 'authorization_policy' must be one of 'one_factor' but it's configured as 'a-policy'",
 			},
 		},
 		{
@@ -1263,33 +1306,8 @@ func TestValidateOIDCClients(t *testing.T) {
 				"identity_providers: oidc: clients: client 'test': option 'scopes' should only have the values 'offline_access' or 'offline' if the client is also configured with a 'response_type' such as 'code', 'code id_token', 'code token', or 'code id_token token' which respond with authorization codes",
 			},
 			[]string{
-				"identity_providers: oidc: clients: client 'test': option 'scopes' has the values 'openid', 'offline', and 'offline_access' however when exclusively utilizing the 'client_credentials' value for the 'grant_types' the values 'openid', 'offline', or 'offline_access' are not allowed",
+				"identity_providers: oidc: clients: client 'test': option 'scopes' has the values 'openid', 'offline', and 'offline_access' however when utilizing the 'client_credentials' value for the 'grant_types' the values 'openid', 'offline', or 'offline_access' are not allowed",
 			},
-		},
-		{
-			"ShouldNotRestrictRefreshOpenIDScopesWithMultipleGrantTypesAndAllowCustomClientCredentials",
-			func(have *schema.IdentityProvidersOpenIDConnect) {
-				have.Clients[0].Public = false
-				have.Clients[0].Scopes = []string{oidc.ScopeOpenID, oidc.ScopeOffline, oidc.ScopeOfflineAccess, "custom"}
-			},
-			nil,
-			tcv{
-				nil,
-				nil,
-				nil,
-				[]string{oidc.GrantTypeClientCredentials, oidc.GrantTypeImplicit},
-			},
-			tcv{
-				[]string{oidc.ScopeOpenID, oidc.ScopeOffline, oidc.ScopeOfflineAccess, "custom"},
-				[]string{oidc.ResponseTypeAuthorizationCodeFlow},
-				[]string{oidc.ResponseModeFormPost, oidc.ResponseModeQuery},
-				[]string{oidc.GrantTypeClientCredentials, oidc.GrantTypeImplicit},
-			},
-			[]string{
-				"identity_providers: oidc: clients: client 'test': option 'scopes' should only have the values 'offline_access' or 'offline' if the client is also configured with a 'response_type' such as 'code', 'code id_token', 'code token', or 'code id_token token' which respond with authorization codes",
-				"identity_providers: oidc: clients: client 'test': option 'grant_types' should only have grant type values which are valid with the configured 'response_types' for the client but 'implicit' expects a response type for either the implicit or hybrid flow such as 'id_token', 'token', 'id_token token', 'code id_token', 'code token', or 'code id_token token' but the response types are 'code'",
-			},
-			nil,
 		},
 		{
 			"ShouldRaiseErrorOnGrantTypeRefreshTokenWithoutScopeOfflineAccess",
@@ -2172,7 +2190,7 @@ func TestValidateOIDCClients(t *testing.T) {
 				"identity_providers: oidc: clients: client 'abc': option 'pkce_challenge_method' must be configured as 'S256' when configured with scope 'authelia.bearer.authz' but it's configured as ''",
 				"identity_providers: oidc: clients: client 'abc': option 'audience' must be configured when configured with scope 'authelia.bearer.authz' but it's absent",
 				"identity_providers: oidc: clients: client 'abc': option 'token_endpoint_auth_method' must be configured as 'client_secret_post', 'client_secret_jwt', or 'private_key_jwt' when configured with scope 'authelia.bearer.authz' and the 'confidential' client type but it's configured as ''",
-				"identity_providers: oidc: clients: client 'abc': option 'scopes' has the values 'authelia.bearer.authz' and 'openid' however when exclusively utilizing the 'client_credentials' value for the 'grant_types' the values 'openid' are not allowed",
+				"identity_providers: oidc: clients: client 'abc': option 'scopes' has the values 'authelia.bearer.authz' and 'openid' however when utilizing the 'client_credentials' value for the 'grant_types' the values 'openid' are not allowed",
 			},
 		},
 		{
