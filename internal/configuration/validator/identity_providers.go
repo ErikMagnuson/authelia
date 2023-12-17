@@ -380,7 +380,15 @@ func validateOIDCClients(config *schema.IdentityProvidersOpenIDConnect, validato
 }
 
 func validateOIDCClient(c int, config *schema.IdentityProvidersOpenIDConnect, validator *schema.StructValidator, errDeprecatedFunc func()) {
+	ccg := utils.IsStringInSlice(oidc.GrantTypeClientCredentials, config.Clients[c].GrantTypes)
+
 	switch {
+	case ccg:
+		if config.Clients[c].AuthorizationPolicy == "" {
+			config.Clients[c].AuthorizationPolicy = policyOneFactor
+		} else if config.Clients[c].AuthorizationPolicy != policyOneFactor {
+			validator.Push(fmt.Errorf(errFmtOIDCClientInvalidValue, config.Clients[c].ID, "authorization_policy", strJoinOr([]string{policyOneFactor}), config.Clients[c].AuthorizationPolicy))
+		}
 	case config.Clients[c].AuthorizationPolicy == "":
 		config.Clients[c].AuthorizationPolicy = schema.DefaultOpenIDConnectClientConfiguration.AuthorizationPolicy
 	case utils.IsStringInSlice(config.Clients[c].AuthorizationPolicy, config.Discovery.AuthorizationPolicies):
@@ -416,11 +424,11 @@ func validateOIDCClient(c int, config *schema.IdentityProvidersOpenIDConnect, va
 		validator.Push(fmt.Errorf(errFmtOIDCClientInvalidValue, config.Clients[c].ID, attrOIDCRequestedAudienceMode, strJoinOr([]string{oidc.ClientRequestedAudienceModeExplicit.String(), oidc.ClientRequestedAudienceModeImplicit.String()}), config.Clients[c].RequestedAudienceMode))
 	}
 
-	setDefaults := validateOIDCClientScopesSpecialBearerAuthz(c, config, validator)
+	setDefaults := validateOIDCClientScopesSpecialBearerAuthz(c, config, ccg, validator)
 
 	validateOIDCClientConsentMode(c, config, validator, setDefaults)
 
-	validateOIDCClientScopes(c, config, validator, errDeprecatedFunc)
+	validateOIDCClientScopes(c, config, validator, ccg, errDeprecatedFunc)
 	validateOIDCClientResponseTypes(c, config, validator, setDefaults, errDeprecatedFunc)
 	validateOIDCClientResponseModes(c, config, validator, setDefaults, errDeprecatedFunc)
 	validateOIDCClientGrantTypes(c, config, validator, setDefaults, errDeprecatedFunc)
@@ -594,8 +602,8 @@ func validateOIDCClientConsentMode(c int, config *schema.IdentityProvidersOpenID
 	}
 }
 
-func validateOIDCClientScopes(c int, config *schema.IdentityProvidersOpenIDConnect, validator *schema.StructValidator, errDeprecatedFunc func()) {
-	if len(config.Clients[c].Scopes) == 0 {
+func validateOIDCClientScopes(c int, config *schema.IdentityProvidersOpenIDConnect, validator *schema.StructValidator, ccg bool, errDeprecatedFunc func()) {
+	if len(config.Clients[c].Scopes) == 0 && !ccg {
 		config.Clients[c].Scopes = schema.DefaultOpenIDConnectClientConfiguration.Scopes
 	}
 
@@ -607,7 +615,7 @@ func validateOIDCClientScopes(c int, config *schema.IdentityProvidersOpenIDConne
 		validator.PushWarning(fmt.Errorf(errFmtOIDCClientInvalidEntryDuplicates, config.Clients[c].ID, attrOIDCScopes, strJoinAnd(duplicates)))
 	}
 
-	if utils.IsStringInSlice(oidc.GrantTypeClientCredentials, config.Clients[c].GrantTypes) {
+	if ccg {
 		validateOIDCClientScopesClientCredentialsGrant(c, config, validator)
 	} else if len(invalid) != 0 {
 		validator.PushWarning(fmt.Errorf(errFmtOIDCClientUnknownScopeEntries, config.Clients[c].ID, attrOIDCScopes, strJoinOr(validOIDCClientScopes), strJoinAnd(invalid)))
@@ -626,7 +634,7 @@ func validateOIDCClientScopes(c int, config *schema.IdentityProvidersOpenIDConne
 }
 
 //nolint:gocyclo
-func validateOIDCClientScopesSpecialBearerAuthz(c int, config *schema.IdentityProvidersOpenIDConnect, validator *schema.StructValidator) bool {
+func validateOIDCClientScopesSpecialBearerAuthz(c int, config *schema.IdentityProvidersOpenIDConnect, ccg bool, validator *schema.StructValidator) bool {
 	if !utils.IsStringInSlice(oidc.ScopeAutheliaBearerAuthz, config.Clients[c].Scopes) {
 		return true
 	}
@@ -663,7 +671,7 @@ func validateOIDCClientScopesSpecialBearerAuthz(c int, config *schema.IdentityPr
 		validator.Push(fmt.Errorf(errFmtOIDCClientOptionRequiredScope, config.Clients[c].ID, "audience", oidc.ScopeAutheliaBearerAuthz))
 	}
 
-	if !utils.IsStringInSlice(oidc.GrantTypeClientCredentials, config.Clients[c].GrantTypes) {
+	if !ccg {
 		if config.Clients[c].ConsentMode != oidc.ClientConsentModeExplicit.String() {
 			validator.Push(fmt.Errorf(errFmtOIDCClientOptionMustScope, config.Clients[c].ID, "consent_mode", "'"+oidc.ClientConsentModeExplicit.String()+"'", oidc.ScopeAutheliaBearerAuthz, config.Clients[c].ConsentMode))
 		}
@@ -700,10 +708,6 @@ func validateOIDCClientScopesSpecialBearerAuthz(c int, config *schema.IdentityPr
 }
 
 func validateOIDCClientScopesClientCredentialsGrant(c int, config *schema.IdentityProvidersOpenIDConnect, validator *schema.StructValidator) {
-	if len(config.Clients[c].GrantTypes) != 1 {
-		return
-	}
-
 	invalid := validateListNotAllowed(config.Clients[c].Scopes, []string{oidc.ScopeOpenID, oidc.ScopeOffline, oidc.ScopeOfflineAccess})
 
 	if len(invalid) > 0 {

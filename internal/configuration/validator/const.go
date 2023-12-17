@@ -227,7 +227,7 @@ const (
 	errFmtOIDCClientOptionMustScope                 = errFmtOIDCClientOption + errFmtMustBeConfiguredAs + errFmtOIDCWhenScope + " but it's configured as '%s'"
 	errFmtOIDCClientOptionMustScopeClientType       = errFmtOIDCClientOption + errFmtMustBeConfiguredAs + errFmtOIDCWhenScope + " and the '%s' client type but it's configured as '%s'"
 	errFmtOIDCClientInvalidEntriesClientCredentials = errFmtOIDCClientOption + "'scopes' has the values " +
-		"%s however when exclusively utilizing the 'client_credentials' value for the 'grant_types' the values %s are not allowed"
+		"%s however when utilizing the 'client_credentials' value for the 'grant_types' the values %s are not allowed"
 	errFmtOIDCClientInvalidEntryDuplicates = errFmtOIDCClientOption + "'%s' must have unique values but the values %s are duplicated"
 	errFmtOIDCClientInvalidValue           = errFmtOIDCClientOption +
 		"'%s' must be one of %s but it's configured as '%s'"
